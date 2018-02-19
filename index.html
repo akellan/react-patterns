@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>React Advanced Components</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+        crossorigin="anonymous">
+    <style type="text/css">
+        .row {
+            margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script src="https://unpkg.com/react@16.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.2.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+
+    <div id="root" class="container"></div>
+
+    <script type="text/babel">
+
+    function ToggleOn({on, children}){
+        return on ? children : null;
+    }
+
+    function ToggleOff({on, children}){
+        return on ? null : children;
+    }
+
+    function ToggleButton({on, toggle, ...props}){
+        return <Switch on={on} onClick={toggle} {...props} />
+    }
+
+
+    class Toggle extends React.Component{
+
+        static On = ToggleOn;
+        static Off = ToggleOff;
+        static Button = ToggleButton;
+        
+        static defaultProps = {onToggle:()=>{}}
+
+        state = { on : false}
+
+        toggle = () => {
+            this.setState(
+                ({on}) => ({on: !on}), 
+                () => this.props.onToggle(this.state.on));
+        }
+
+        render(){
+            const children = React.Children.map(
+                this.props.children,
+                child => React.cloneElement(child, {
+                    on: this.state.on,
+                    toggle: this.toggle
+                }),);
+
+            return <React.Fragment>{children}</React.Fragment>;
+        }
+    }
+    
+    function App() {
+        return (
+        <div className='row'>
+            <div className='col-sm'></div>
+                <div className='col-sm'>
+                    <Toggle onToggle={on => console.log('toggle', on)}>
+                        <Toggle.Button />
+                        <Toggle.On>Button is on.</Toggle.On>
+                        <Toggle.Off>Button is off.</Toggle.Off>
+                    </Toggle>
+                </div>
+            <div className='col-sm'></div>
+        </div>);
+    }
+
+    function Switch({on, ...props}){
+        return (<button 
+            type="button" 
+            className={`btn ${on ? 'btn-primary' : 'btn-secondary'}`} 
+            {...props}>
+                Primary
+            </button>)
+    }
+
+    ReactDOM.render(<App />,document.getElementById('root'));
+
+    </script>
+
+
+
+</body>
+
+</html>
